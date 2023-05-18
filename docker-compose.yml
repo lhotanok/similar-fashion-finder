@@ -2,28 +2,49 @@ version: '3'
 services:
   mysql:
     image: mysql:latest
+    restart: always
     ports:
       - 3306:3306
     environment:
-      - MYSQL_USERNAME=${MYSQL_USERNAME}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: images
+    volumes:
+      - mysql_data:/var/lib/mysql
 
-  mongodb:
-    image: mongo:latest
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    links:
+      - mysql
     ports:
-      - 27017:27017
+      - 8080:80
     environment:
-      - MONGO_INITDB_USERNAME=${MONGO_INITDB_USERNAME}
-      - MONGO_INITDB_PASSWORD=${MONGO_INITDB_PASSWORD}
+      - PMA_HOST=mysql
+
+  mongo:
+    image: mongo:6.0.2
+    restart: always
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: fashion
+      MONGO_INITDB_ROOT_PASSWORD: 1234
 
   mongo-express:
     image: mongo-express
+    restart: always
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ADMINUSERNAME: fashion
+      ME_CONFIG_MONGODB_ADMINPASSWORD: 1234
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+      ME_CONFIG_SITE_BASEURL: /mongo-express
+    depends_on:
+      - mongo
     ports:
       - 8081:8081
-    environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_INITDB_USERNAME}
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_INITDB_PASSWORD}
-      - ME_CONFIG_MONGODB_SERVER=mongodb
-      - ME_CONFIG_BASICAUTH_USERNAME=admin
-      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+
+volumes:
+  mysql_data:
+  mongodb_data:
