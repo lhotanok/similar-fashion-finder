@@ -25,15 +25,21 @@ const injectIdsToFiles = (filesDirectory) => {
 
     readFiles(`${__dirname}/${filesDirectory}/`, (filename, content) => {
         const products = JSON.parse(content);
-        const productsWithIds = products.map((product) => ({
-            id: null,
-            ...product,
-            id: uuidv5(product.url, NAMESPACE),
-        }));
+        const productsWithIds = {};
+
+        products.forEach((product) => {
+            const id = uuidv5(product.url, NAMESPACE);
+
+            productsWithIds[id] = {
+                id: null,
+                ...product,
+                id,
+            };
+        });
 
         fs.writeFileSync(
             `${__dirname}/${filesDirectory}/${filename}`,
-            JSON.stringify(productsWithIds, null, 2),
+            JSON.stringify(Object.values(productsWithIds), null, 2),
         );
     }, (err) => {
         throw err;

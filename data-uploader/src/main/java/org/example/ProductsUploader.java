@@ -11,6 +11,7 @@ import com.mongodb.client.MongoDatabase;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ProductsUploader {
     private final MongoClient client;
@@ -34,7 +35,7 @@ public class ProductsUploader {
     }
 
     public <ProductType extends MongoDocument> void uploadProducts(
-            String productsFilepath,
+            File productsFile,
             String collectionName,
             Class<ProductType> productType
     ) throws IOException {
@@ -46,7 +47,7 @@ public class ProductsUploader {
         System.out.println("Getting collection: " + collectionName);
         MongoCollection<ProductType> collection = productsDb.getCollection(collectionName, productType);
 
-        List<ProductType> products = deserializeJsonCollection(productsFilepath, productType);
+        List<ProductType> products = deserializeJsonCollection(productsFile, productType);
         System.out.println("Loaded products: " + products.size());
 
         List<ProductType> productsToUpload = filterNewProducts(products, collection);
@@ -80,7 +81,7 @@ public class ProductsUploader {
         var newProducts = productsToUpload.stream()
                 .filter(product -> !uploadedIds.containsKey(product.id()));
 
-        return newProducts.toList();
+        return newProducts.collect(Collectors.toList());
     }
 
     private boolean collectionExists (String collectionName) {
@@ -96,13 +97,11 @@ public class ProductsUploader {
 
         return false;
     }
-    private <T> List<T> deserializeJsonCollection(String jsonFilepath, Class<T> objectType) throws IOException {
-        System.out.println("Deserializing collection from: " + jsonFilepath);
+    private <T> List<T> deserializeJsonCollection(File jsonFile, Class<T> objectType) throws IOException {
+        System.out.println("Deserializing collection from: " + jsonFile.getPath());
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        File jsonFile = new File(jsonFilepath);
 
         var collectionType = mapper.getTypeFactory()
                 .constructCollectionType(ArrayList.class, objectType);

@@ -1,5 +1,6 @@
 package org.example;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -28,7 +29,7 @@ public record ZootProduct (
         boolean available
 ) implements MongoDocument {
     public record Price(
-            double value,
+            BigDecimal value,
             String formattedPrice
     ) {}
 
