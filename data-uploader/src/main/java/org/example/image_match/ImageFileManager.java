@@ -16,6 +16,10 @@ public class ImageFileManager {
                     downloadedFile
             );
 
+            System.out.println(
+                    String.format("Downloaded file '%s', can read: ", localFilepath) + downloadedFile.canRead()
+            );
+
             return downloadedFile;
         } catch (IOException e) {
             throw new IllegalArgumentException("File could not be downloaded." +
