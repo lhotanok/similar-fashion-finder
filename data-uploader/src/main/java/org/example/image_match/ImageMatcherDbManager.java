@@ -33,7 +33,11 @@ public class ImageMatcherDbManager  implements AutoCloseable {
 
     private static void initializeMatchingAlgorithms(H2DatabaseImageMatcher db) {
         System.out.println(
-                "Initializing image matching MySQL database with hashing algorithms: AverageHash, AverageColorHash"
+                "Initializing image matching MySQL database with hashing algorithms: " +
+                        "AverageHash, " +
+                        "AverageColorHash, " +
+                        "DifferenceHash, " +
+                        "PerceptiveHash"
         );
 
         db.addHashingAlgorithm(new AverageColorHash(64), 0.4);

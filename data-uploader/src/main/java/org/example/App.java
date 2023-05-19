@@ -1,12 +1,15 @@
 package org.example;
 
-import org.example.image_match.ImageRetrieval;
 import org.example.image_match.ImagesUploader;
+import org.example.image_search_api.ImageSearchApi;
 import org.example.mongodb.ProductsUploader;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
+
+import static org.example.image_search_api.SwaggerConfiguration.preInitializeSwagger;
+import static org.example.image_search_api.SwaggerConfiguration.setupSwagger;
 
 public class App
 {
@@ -21,24 +24,16 @@ public class App
                 "Program args (expecting arguments mongoUsername, mongoPassword, mysqlUsername and mysqlPassword" +
                         " in this order, otherwise using default credentials for both DBs): " + Arrays.toString(args));
 
-        uploadProductsToMongo(args);
-
         String mysqlUsername = args.length > 2 ? args[2] : DEFAULT_MYSQL_DB_USERNAME;
         String mysqlPassword = args.length > 3 ? args[3] : DEFAULT_MYSQL_DB_PASSWORD;
         System.out.printf("MySQL username: %s, password: %s%n", mysqlUsername, mysqlPassword);
 
+        uploadProductsToMongo(args);
         uploadImagesToMySql(mysqlUsername, mysqlPassword);
 
-        try (var imagesRetrieval = new ImageRetrieval(mysqlUsername, mysqlPassword)) {
-            String imageToMatchUrl = "https://img01.ztat.net/article/spp-media-p1/4d886b16c24641208f2f592f6bfb4208/50d0758fc3b840daa4e4ff4c35144371.jpg?imwidth=1800";
-            var matchingImages = imagesRetrieval.getMatchingImages(imageToMatchUrl);
-        } catch (SQLException e) {
-            throw new IllegalArgumentException(
-                    "Invalid credentials for MySQL database provided, full message: " + e.getMessage()
-            );
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        preInitializeSwagger();
+        setupImageSearchApi(mysqlUsername, mysqlPassword);
+        setupSwagger();
     }
 
     private static void uploadProductsToMongo(String[] args) {
@@ -57,6 +52,19 @@ public class App
     private static void uploadImagesToMySql(String mysqlUsername, String mysqlPassword) {
         try (var imagesUploader = new ImagesUploader(mysqlUsername, mysqlPassword)) {
             imagesUploader.uploadProductImages();
+        } catch (SQLException e) {
+            throw new IllegalArgumentException(
+                    "Invalid credentials for MySQL database provided, full message: " + e.getMessage()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void setupImageSearchApi(String mysqlUsername, String mysqlPassword) {
+        try {
+            var imageSearchApi = new ImageSearchApi(mysqlUsername, mysqlPassword);
+            imageSearchApi.setupUrlBasedSearchEndpoint();
         } catch (SQLException e) {
             throw new IllegalArgumentException(
                     "Invalid credentials for MySQL database provided, full message: " + e.getMessage()

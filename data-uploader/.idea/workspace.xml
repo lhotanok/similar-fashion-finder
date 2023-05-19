@@ -6,8 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="c04c8021-05f7-41e1-9027-561263e9bf00" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/App.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/image_match/ImagesUploader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/image_match/ImagesUploader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/image_match/ImageMatcherDbManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/image_match/ImageMatcherDbManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/image_match/ImageRetrieval.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/image_match/ImagesRetrieval.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mongodb/ProductsUploader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mongodb/ProductsUploader.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -91,7 +93,7 @@
       <workItem from="1684450403834" duration="845000" />
       <workItem from="1684451272262" duration="3250000" />
       <workItem from="1684454570608" duration="7610000" />
-      <workItem from="1684462213432" duration="13928000" />
+      <workItem from="1684462213432" duration="20694000" />
     </task>
     <servers />
   </component>

@@ -130,8 +130,6 @@ public class ProductsUploader implements AutoCloseable {
         System.out.println("Checking if collection already exists: " + collectionName);
 
         for (String existingName: productsDb.listCollectionNames()) {
-            System.out.println("Collection: " + existingName);
-
             if (existingName.equalsIgnoreCase(collectionName)) {
                 return true;
             }

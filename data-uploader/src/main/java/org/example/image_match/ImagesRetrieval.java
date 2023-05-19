@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.PriorityQueue;
 
-public class ImageRetrieval extends ImageMatcherDbManager {
+public class ImagesRetrieval extends ImageMatcherDbManager {
 
-    public ImageRetrieval(String sqlUsername, String sqlPassword) throws SQLException {
+    public ImagesRetrieval(String sqlUsername, String sqlPassword) throws SQLException {
         super(sqlUsername, sqlPassword);
     }
     public PriorityQueue<Result<String>> getMatchingImages(String imageRemoteUrl) throws SQLException, IOException {
