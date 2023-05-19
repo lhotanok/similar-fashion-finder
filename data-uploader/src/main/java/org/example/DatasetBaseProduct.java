@@ -1,11 +1,12 @@
-package org.example.mongodb;
+package org.example;
 
 import org.bson.BsonType;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonRepresentation;
 
-public interface MongoDocument {
+public interface DatasetBaseProduct {
     @BsonId()
     @BsonRepresentation(BsonType.STRING)
     String id();
+    String thumbnail();
 }

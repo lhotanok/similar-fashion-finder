@@ -1,4 +1,4 @@
-package org.example.mongodb;
+package org.example;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.bson.BsonType;
@@ -36,7 +36,7 @@ public record ZalandoProduct (
         String navigationTargetGroup,
         Condition condition,
         List<AttributeCategory> attributeCategories
-) implements MongoDocument {
+) implements DatasetBaseProduct {
     public record Brand(
             String name,
             String uri

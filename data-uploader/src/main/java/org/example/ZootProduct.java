@@ -1,4 +1,4 @@
-package org.example.mongodb;
+package org.example;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -27,7 +27,7 @@ public record ZootProduct (
         List<Attribute> attributes,
         List<Size> sizes,
         boolean available
-) implements MongoDocument {
+) implements DatasetBaseProduct {
     public record Price(
             BigDecimal value,
             String formattedPrice

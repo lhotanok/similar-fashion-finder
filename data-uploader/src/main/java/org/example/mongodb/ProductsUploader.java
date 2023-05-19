@@ -1,30 +1,31 @@
 package org.example.mongodb;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.MongoBulkWriteException;
 import com.mongodb.MongoSecurityException;
-import com.mongodb.client.*;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+import org.example.dataset_products.DatasetDeserializer;
+import org.example.DatasetBaseProduct;
+import org.example.ZalandoProduct;
+import org.example.ZootProduct;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ProductsUploader {
+public class ProductsUploader implements AutoCloseable {
     private final MongoClient client;
     private final MongoDatabase productsDb;
     private final String connectionUri;
     private static final String DB_NAME = "products";
     private static final String ZOOT_PRODUCTS_COLLECTION = "zoot-products";
     private static final String ZALANDO_PRODUCTS_COLLECTION = "zalando-products";
-    private final static URL ZOOT_PRODUCTS_DIR = ProductsUploader.class.getResource("/datasets/zoot");
-    private final static URL ZALANDO_PRODUCTS_DIR = ProductsUploader.class.getResource("/datasets/zalando");
-    private final static String INVALID_PRODUCTS_DIR_MESSAGE = "Dataset directories are not setup correctly." +
-            "Package 'org.example' has to include 'datasets' directory" +
-            "with 'zalando' and 'zoot' subdirectories.";
 
     public ProductsUploader(String dbUsername, String dbPassword) {
         connectionUri = String.format(
@@ -43,30 +44,16 @@ public class ProductsUploader {
     }
 
     public void uploadNewProducts() throws IOException, IllegalArgumentException {
-        List<File> zootFiles;
-        List<File> zalandoFiles;
-
-        if (ZOOT_PRODUCTS_DIR == null || ZALANDO_PRODUCTS_DIR == null) {
-            throw new RuntimeException(INVALID_PRODUCTS_DIR_MESSAGE);
-        }
-
         try {
-            zootFiles = getProductFiles(ZOOT_PRODUCTS_DIR);
-            zalandoFiles = getProductFiles(ZALANDO_PRODUCTS_DIR);
-        } catch (URISyntaxException ex) {
-            throw new RuntimeException(INVALID_PRODUCTS_DIR_MESSAGE);
-        }
-
-        try {
-            for (File file: zootFiles) {
-                tryUploadProducts(
-                        file, ZOOT_PRODUCTS_COLLECTION, ZootProduct.class
+            for (File zootFile: DatasetDeserializer.getZootDatasetFiles()) {
+                tryUploadProductsToMongo(
+                        zootFile, ZOOT_PRODUCTS_COLLECTION, ZootProduct.class
                 );
             }
 
-            for (File file: zalandoFiles) {
-                tryUploadProducts(
-                        file, ZALANDO_PRODUCTS_COLLECTION, ZalandoProduct.class
+            for (File zalandoFile: DatasetDeserializer.getZalandoDatasetFiles()) {
+                tryUploadProductsToMongo(
+                        zalandoFile, ZALANDO_PRODUCTS_COLLECTION, ZalandoProduct.class
                 );
             }
         } catch (MongoSecurityException ex) {
@@ -76,7 +63,14 @@ public class ProductsUploader {
         }
     }
 
-    private <ProductType extends MongoDocument> void uploadProductsFromFile(
+
+    @Override
+    public void close() {
+        System.out.println("Closing connection to MongoDB with products");
+        client.close();
+    }
+
+    private <ProductType extends DatasetBaseProduct> void uploadProductsFromFile(
             File productsFile,
             String collectionName,
             Class<ProductType> productType
@@ -89,7 +83,12 @@ public class ProductsUploader {
         System.out.println("Getting collection: " + collectionName);
         MongoCollection<ProductType> collection = productsDb.getCollection(collectionName, productType);
 
-        List<ProductType> products = deserializeJsonCollection(productsFile, productType);
+        System.out.println(collectionName + ": Creating index on field 'thumbnail' for efficient retrieval " +
+                "based on thumbnail");
+        Document thumbnailIndex = new Document("thumbnail", 1);
+        collection.createIndex(thumbnailIndex);
+
+        List<ProductType> products = DatasetDeserializer.deserializeJsonCollection(productsFile, productType);
         System.out.println("Loaded products: " + products.size());
 
         List<ProductType> productsToUpload = filterNewProducts(products, collection);
@@ -114,7 +113,7 @@ public class ProductsUploader {
         }
     }
 
-    private <ProductType extends MongoDocument> List<ProductType> filterNewProducts(
+    private <ProductType extends DatasetBaseProduct> List<ProductType> filterNewProducts(
             List<ProductType> productsToUpload, MongoCollection<ProductType> collection
     ) {
         Map<String, Boolean> uploadedIds = new HashMap<>();
@@ -139,32 +138,8 @@ public class ProductsUploader {
 
         return false;
     }
-    private <T extends  MongoDocument> List<T> deserializeJsonCollection(File jsonFile, Class<T> objectType)
-            throws IOException {
-        System.out.println("Deserializing collection from: " + jsonFile.getPath());
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        var collectionType = mapper.getTypeFactory()
-                .constructCollectionType(ArrayList.class, objectType);
-
-        return mapper.readValue(jsonFile, collectionType);
-    }
-
-    private static List<File> getProductFiles (URL productsDirUrl) throws URISyntaxException {
-        File productsDir = new File(productsDirUrl.toURI());
-
-        System.out.println("Is '" + productsDir.getName() + "' a directory: " + productsDir.isDirectory());
-
-        File[] productFiles = productsDir.listFiles();
-
-        return productFiles != null
-                ? Arrays.stream(productFiles).collect(Collectors.toList())
-                : new ArrayList<>();
-    }
-
-    private <ProductType extends MongoDocument> void tryUploadProducts (
+    private <ProductType extends DatasetBaseProduct> void tryUploadProductsToMongo(
             File productsFile,
             String collectionName,
             Class<ProductType> productType
