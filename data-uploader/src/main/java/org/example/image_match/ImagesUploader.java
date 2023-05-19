@@ -1,7 +1,7 @@
 package org.example.image_match;
 
-import dev.brachtendorf.jimagehash.hashAlgorithms.AverageColorHash;
-import dev.brachtendorf.jimagehash.hashAlgorithms.AverageHash;
+import dev.brachtendorf.jimagehash.datastructures.tree.Result;
+import dev.brachtendorf.jimagehash.hashAlgorithms.*;
 import dev.brachtendorf.jimagehash.matcher.persistent.database.H2DatabaseImageMatcher;
 import org.example.DatasetBaseProduct;
 import org.example.ZalandoProduct;
@@ -13,10 +13,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.concurrent.*;
 
 public class ImagesUploader implements AutoCloseable {
-    private static final String DB_NAME = "images";
+    private static final String DB_NAME = "imageHashDB";
     private static final int THREADS_FOR_IMAGE_DOWNLOAD = 10;
 
     private final H2DatabaseImageMatcher db;
@@ -27,11 +28,7 @@ public class ImagesUploader implements AutoCloseable {
 
         db = new H2DatabaseImageMatcher(DB_NAME, sqlUsername, sqlPassword);
 
-        System.out.println(
-                "Initializing image matching MySQL database with hashing algorithms: AverageHash, AverageColorHash"
-        );
-        db.addHashingAlgorithm(new AverageColorHash(32), .4);
-        db.addHashingAlgorithm(new AverageHash(32), .10);
+        initializeMatchingAlgorithms();
     }
 
     public void uploadProductImages() throws IOException, SQLException, InterruptedException {
@@ -50,6 +47,31 @@ public class ImagesUploader implements AutoCloseable {
 
             uploadThumbnailHashesToDbParallel(zootProducts);
         }
+    }
+
+    private void initializeMatchingAlgorithms() {
+        System.out.println(
+                "Initializing image matching MySQL database with hashing algorithms: AverageHash, AverageColorHash"
+        );
+
+        db.addHashingAlgorithm(new AverageColorHash(64), 0.4);
+        db.addHashingAlgorithm(new AverageHash(64), 0.3);
+        db.addHashingAlgorithm(new DifferenceHash(64, DifferenceHash.Precision.Simple), 0.4);
+        db.addHashingAlgorithm(new PerceptiveHash(64), 0.4);
+    }
+
+    public PriorityQueue<Result<String>> getMatchingImages(String imageRemoteUrl) throws SQLException, IOException {
+        var exampleImageToBeMatched = ImageFileManager.downloadFile(
+                imageRemoteUrl,
+                buildTempFilename("christian-jumper")
+        );
+
+        PriorityQueue<Result<String>> results = db.getMatchingImages(exampleImageToBeMatched);
+
+        System.out.println("Matched images for: " + imageRemoteUrl);
+        results.forEach(System.out::println);
+
+        return results;
     }
 
     @Override
@@ -157,10 +179,10 @@ public class ImagesUploader implements AutoCloseable {
             }
         }
 
-        System.out.println("Waiting for 30 seconds before deleting temporarily downloaded image files");
-        Thread.sleep(30_000);
+        /*System.out.println("Waiting for 15 seconds before deleting temporarily downloaded image files");
+        Thread.sleep(15_000);
 
         downloadedImages.forEach(ImageFileManager::deleteFile);
-        System.out.printf("All temporary files for %d thumbnail files were deleted%n", downloadedImages.size());
+        System.out.printf("All temporary files for %d thumbnail files were deleted%n", downloadedImages.size());*/
     }
 }

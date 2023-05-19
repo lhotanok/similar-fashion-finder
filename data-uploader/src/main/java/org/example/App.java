@@ -12,8 +12,8 @@ public class App
     private static final String DEFAULT_MONGO_DB_USERNAME = "fashion";
     private static final String DEFAULT_MONGO_DB_PASSWORD = "1234";
 
-    private static final String DEFAULT_MYSQL_DB_USERNAME = "root";
-    private static final String DEFAULT_MYSQL_DB_PASSWORD = "";
+    private static final String DEFAULT_MYSQL_DB_USERNAME = "admin";
+    private static final String DEFAULT_MYSQL_DB_PASSWORD = "admin";
 
     public static void main(String[] args) {
         System.out.println(
@@ -37,6 +37,9 @@ public class App
 
         try (var imagesUploader = new ImagesUploader(mysqlUsername, mysqlPassword)) {
             imagesUploader.uploadProductImages();
+
+            String imageToMatchUrl = "https://img01.ztat.net/article/spp-media-p1/4d886b16c24641208f2f592f6bfb4208/50d0758fc3b840daa4e4ff4c35144371.jpg?imwidth=1800";
+            var matchingImages = imagesUploader.getMatchingImages(imageToMatchUrl);
         } catch (SQLException e) {
             throw new IllegalArgumentException(
                     "Invalid credentials for MySQL database provided, full message: " + e.getMessage()
