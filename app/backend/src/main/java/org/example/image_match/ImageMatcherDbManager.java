@@ -26,6 +26,7 @@ public class ImageMatcherDbManager implements AutoCloseable {
     ) throws SQLException {
         var db = new H2DatabaseImageMatcher(DB_NAME, sqlUsername, sqlPassword);
 
+        db.clearHashingAlgorithms(true);
         initializeMatchingAlgorithms(db);
 
         return db;

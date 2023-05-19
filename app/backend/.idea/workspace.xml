@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c04c8021-05f7-41e1-9027-561263e9bf00" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../../docker-compose.yml" beforeDir="false" />
-    </list>
+    <list default="true" id="c04c8021-05f7-41e1-9027-561263e9bf00" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -57,10 +55,12 @@
       <recent name="org.example" />
     </key>
   </component>
-  <component name="RunManager" selected="Docker.Dockerfile">
+  <component name="RunManager" selected="Application.App">
     <configuration name="App" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="ALTERNATIVE_JRE_PATH" value="19" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="MAIN_CLASS_NAME" value="org.example.App" />
-      <module name="data-uploader" />
+      <module name="backend" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="org.example.*" />
@@ -86,8 +86,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Docker.Dockerfile" />
         <item itemvalue="Application.App" />
+        <item itemvalue="Docker.Dockerfile" />
       </list>
     </recent_temporary>
   </component>
@@ -105,7 +105,7 @@
       <workItem from="1684451272262" duration="3250000" />
       <workItem from="1684454570608" duration="7610000" />
       <workItem from="1684462213432" duration="23971000" />
-      <workItem from="1684488466518" duration="1099000" />
+      <workItem from="1684488466518" duration="2720000" />
     </task>
     <servers />
   </component>
