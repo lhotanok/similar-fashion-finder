@@ -1,4 +1,4 @@
-package org.example;
+package org.example.mongodb;
 
 import org.bson.BsonType;
 import org.bson.codecs.pojo.annotations.BsonId;

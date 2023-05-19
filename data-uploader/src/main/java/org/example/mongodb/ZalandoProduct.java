@@ -1,4 +1,4 @@
-package org.example;
+package org.example.mongodb;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.bson.BsonType;
@@ -40,13 +40,13 @@ public record ZalandoProduct (
     public record Brand(
             String name,
             String uri
-    ) {}
+    ) { }
 
     public record Flag(
             String formatted,
             String kind,
             String info
-    ) {}
+    ) { }
 
     public record RatingHistogram(
             int rating1Count,
@@ -54,7 +54,7 @@ public record ZalandoProduct (
             int rating2Count,
             int rating4Count,
             int rating5Count
-    ) {}
+    ) { }
 
     public record Review(
             String authorName,
@@ -66,7 +66,7 @@ public record ZalandoProduct (
     public record Color(
             String name,
             String label
-    ) {}
+    ) { }
 
     public record Price(
             BigDecimal original,

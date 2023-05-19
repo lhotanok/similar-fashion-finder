@@ -1,4 +1,4 @@
-package org.example;
+package org.example.mongodb;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -31,25 +31,25 @@ public record ZootProduct (
     public record Price(
             BigDecimal value,
             String formattedPrice
-    ) {}
+    ) { }
 
     public record Brand(
             String link,
             String logo
-    ) {}
+    ) { }
 
     public record Breadcrumb(
             String text,
             String url
-    ) {}
+    ) { }
 
     public record Attribute(
             String key,
             String value
-    ) {}
+    ) { }
 
     public record Size(
             String size,
             boolean available
-    ) {}
+    ) { }
 }

@@ -5,17 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c04c8021-05f7-41e1-9027-561263e9bf00" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/assign-unique-ids.js" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/assign-unique-ids.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/data/zalando/zalando-men-fashion.json" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/data/zalando/zalando-men-fashion.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/data/zalando/zalando-women-fashion.json" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/data/zalando/zalando-women-fashion.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/data/zoot/zoot-men-fashion.json" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/data/zoot/zoot-men-fashion.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/data/zoot/zoot-women-fashion.json" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/data/zoot/zoot-women-fashion.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/App.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/ProductsUploader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/ProductsUploader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/ZootProduct.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/ZootProduct.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/MongoDocument.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mongodb/MongoDocument.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/ProductsUploader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mongodb/ProductsUploader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/ZalandoProduct.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mongodb/ZalandoProduct.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/ZootProduct.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mongodb/ZootProduct.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,7 +62,7 @@
       <module name="data-uploader" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="org.example.*" />
+          <option name="PATTERN" value="org.example.mongodb.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -91,7 +87,7 @@
       <workItem from="1684424824474" duration="15107000" />
       <workItem from="1684448758474" duration="1492000" />
       <workItem from="1684450403834" duration="845000" />
-      <workItem from="1684451272262" duration="640000" />
+      <workItem from="1684451272262" duration="3250000" />
     </task>
     <servers />
   </component>
