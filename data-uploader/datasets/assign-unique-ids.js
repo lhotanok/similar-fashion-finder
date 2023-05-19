@@ -30,9 +30,14 @@ const injectIdsToFiles = (filesDirectory) => {
         products.forEach((product) => {
             const id = uuidv5(product.url, NAMESPACE);
 
+            const thumbnail = product.thumbnail
+                ? product.thumbnail.replace(/\?.*$/, '')
+                : product.images[0] || null;
+
             productsWithIds[id] = {
                 id: null,
                 ...product,
+                thumbnail,
                 id,
             };
         });
