@@ -6,18 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="c04c8021-05f7-41e1-9027-561263e9bf00" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/data/zalando/zalando-women-fashion.json" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/data/zalando/zalando-women-fashion.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/data/zoot/zoot-women-fashion.json" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/data/zoot/zoot-women-fashion.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/App.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/image_match/ImagesUploader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/image_match/ImagesUploader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/datasets/zalando/zalando-men-fashion.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/datasets/zalando/zalando-men-fashion.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/datasets/zalando/zalando-women-fashion.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/datasets/zalando/zalando-women-fashion.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/datasets/zoot/zoot-men-fashion.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/datasets/zoot/zoot-men-fashion.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/datasets/zoot/zoot-women-fashion.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/datasets/zoot/zoot-women-fashion.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/datasets/zalando/zalando-men-fashion.json" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/datasets/zalando/zalando-men-fashion.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/datasets/zalando/zalando-women-fashion.json" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/datasets/zalando/zalando-women-fashion.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/datasets/zoot/zoot-men-fashion.json" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/datasets/zoot/zoot-men-fashion.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/datasets/zoot/zoot-women-fashion.json" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/datasets/zoot/zoot-women-fashion.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mongodb/ProductsUploader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mongodb/ProductsUploader.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -100,7 +91,7 @@
       <workItem from="1684450403834" duration="845000" />
       <workItem from="1684451272262" duration="3250000" />
       <workItem from="1684454570608" duration="7610000" />
-      <workItem from="1684462213432" duration="11679000" />
+      <workItem from="1684462213432" duration="13928000" />
     </task>
     <servers />
   </component>

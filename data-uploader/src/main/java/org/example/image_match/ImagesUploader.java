@@ -1,7 +1,6 @@
 package org.example.image_match;
 
 import dev.brachtendorf.jimagehash.datastructures.tree.Result;
-import dev.brachtendorf.jimagehash.hashAlgorithms.*;
 import dev.brachtendorf.jimagehash.matcher.persistent.database.H2DatabaseImageMatcher;
 import org.example.DatasetBaseProduct;
 import org.example.ZalandoProduct;
@@ -16,19 +15,11 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.concurrent.*;
 
-public class ImagesUploader implements AutoCloseable {
-    private static final String DB_NAME = "imageHashDB";
+public class ImagesUploader extends ImageMatcherDbManager {
     private static final int THREADS_FOR_IMAGE_DOWNLOAD = 10;
 
-    private final H2DatabaseImageMatcher db;
-
     public ImagesUploader(String sqlUsername, String sqlPassword) throws SQLException {
-        System.out.println("Connecting to image matching MySQL database: " + DB_NAME);
-        System.out.println("username:password   ...   " + sqlUsername + ":" + sqlPassword);
-
-        db = new H2DatabaseImageMatcher(DB_NAME, sqlUsername, sqlPassword);
-
-        initializeMatchingAlgorithms();
+        super(sqlUsername, sqlPassword);
     }
 
     public void uploadProductImages() throws IOException, SQLException, InterruptedException {
@@ -47,37 +38,6 @@ public class ImagesUploader implements AutoCloseable {
 
             uploadThumbnailHashesToDbParallel(zootProducts);
         }
-    }
-
-    private void initializeMatchingAlgorithms() {
-        System.out.println(
-                "Initializing image matching MySQL database with hashing algorithms: AverageHash, AverageColorHash"
-        );
-
-        db.addHashingAlgorithm(new AverageColorHash(64), 0.4);
-        db.addHashingAlgorithm(new AverageHash(64), 0.3);
-        db.addHashingAlgorithm(new DifferenceHash(64, DifferenceHash.Precision.Simple), 0.4);
-        db.addHashingAlgorithm(new PerceptiveHash(64), 0.4);
-    }
-
-    public PriorityQueue<Result<String>> getMatchingImages(String imageRemoteUrl) throws SQLException, IOException {
-        var exampleImageToBeMatched = ImageFileManager.downloadFile(
-                imageRemoteUrl,
-                buildTempFilename("christian-jumper")
-        );
-
-        PriorityQueue<Result<String>> results = db.getMatchingImages(exampleImageToBeMatched);
-
-        System.out.println("Matched images for: " + imageRemoteUrl);
-        results.forEach(System.out::println);
-
-        return results;
-    }
-
-    @Override
-    public void close() throws SQLException {
-        System.out.println("Closing connection to MySQL database with images");
-        db.close();
     }
 
     private <ProductType extends DatasetBaseProduct> void uploadThumbnailHashesToDbParallel(List<ProductType> products)
@@ -121,10 +81,6 @@ public class ImagesUploader implements AutoCloseable {
         }
     }
 
-    private String buildTempFilename (String productId) {
-        return "target/downloaded-images/" + productId + ".jpg";
-    }
-
     private <ProductType extends DatasetBaseProduct> void uploadThumbnailHashesToDb(List<ProductType> products)
             throws SQLException, IOException, InterruptedException {
         List<File> downloadedImages = new ArrayList<>();
@@ -156,7 +112,7 @@ public class ImagesUploader implements AutoCloseable {
         System.out.printf(
                 "Uploading hashes for %d images to MySQL database '%s'%n",
                 downloadedImages.size(),
-                DB_NAME
+                ImageMatcherDbManager.DB_NAME
         );
 
         // It would be more efficient to add all images at once, but it has a tendency to fail and in that case it
@@ -179,10 +135,10 @@ public class ImagesUploader implements AutoCloseable {
             }
         }
 
-        /*System.out.println("Waiting for 15 seconds before deleting temporarily downloaded image files");
+        System.out.println("Waiting for 15 seconds before deleting temporarily downloaded image files");
         Thread.sleep(15_000);
 
         downloadedImages.forEach(ImageFileManager::deleteFile);
-        System.out.printf("All temporary files for %d thumbnail files were deleted%n", downloadedImages.size());*/
+        System.out.printf("All temporary files for %d thumbnail files were deleted%n", downloadedImages.size());
     }
 }

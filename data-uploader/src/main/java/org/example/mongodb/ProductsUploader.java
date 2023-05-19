@@ -83,10 +83,11 @@ public class ProductsUploader implements AutoCloseable {
         System.out.println("Getting collection: " + collectionName);
         MongoCollection<ProductType> collection = productsDb.getCollection(collectionName, productType);
 
-        System.out.println(collectionName + ": Creating index on field 'thumbnail' for efficient retrieval " +
+        // In the end, thumbnail index should not be needed
+        /*System.out.println(collectionName + ": Creating index on field 'thumbnail' for efficient retrieval " +
                 "based on thumbnail");
         Document thumbnailIndex = new Document("thumbnail", 1);
-        collection.createIndex(thumbnailIndex);
+        collection.createIndex(thumbnailIndex);*/
 
         List<ProductType> products = DatasetDeserializer.deserializeJsonCollection(productsFile, productType);
         System.out.println("Loaded products: " + products.size());
