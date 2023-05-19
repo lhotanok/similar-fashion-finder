@@ -2,15 +2,11 @@ package org.example.mongodb;
 
 import com.mongodb.MongoBulkWriteException;
 import com.mongodb.MongoSecurityException;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import org.bson.Document;
-import org.example.dataset_products.DatasetDeserializer;
 import org.example.DatasetBaseProduct;
 import org.example.ZalandoProduct;
 import org.example.ZootProduct;
+import org.example.dataset_products.DatasetDeserializer;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,28 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ProductsUploader implements AutoCloseable {
-    private final MongoClient client;
-    private final MongoDatabase productsDb;
-    private final String connectionUri;
-    private static final String DB_NAME = "products";
-    private static final String ZOOT_PRODUCTS_COLLECTION = "zoot-products";
-    private static final String ZALANDO_PRODUCTS_COLLECTION = "zalando-products";
-
+public class ProductsUploader extends ProductsDbManager {
     public ProductsUploader(String dbUsername, String dbPassword) {
-        connectionUri = String.format(
-                "mongodb://%s:%s@localhost:27017/%s?authSource=admin",
-                dbUsername,
-                dbPassword,
-                DB_NAME
-        );
-
-        System.out.println("Creating client with Mongo connection URI: " + connectionUri);
-        client = MongoClients.create(connectionUri);
-
-        System.out.println("Client created, getting database: " + DB_NAME);
-        productsDb = client.getDatabase(DB_NAME);
-        System.out.println("Loaded database: " + DB_NAME);
+        super(dbUsername, dbPassword);
     }
 
     public void uploadNewProducts() throws IOException, IllegalArgumentException {
@@ -61,13 +38,6 @@ public class ProductsUploader implements AutoCloseable {
                     "Could not connect to MongoDB. Invalid connection string: " + connectionUri
             );
         }
-    }
-
-
-    @Override
-    public void close() {
-        System.out.println("Closing connection to MongoDB with products");
-        client.close();
     }
 
     private <ProductType extends DatasetBaseProduct> void uploadProductsFromFile(
@@ -118,7 +88,9 @@ public class ProductsUploader implements AutoCloseable {
             List<ProductType> productsToUpload, MongoCollection<ProductType> collection
     ) {
         Map<String, Boolean> uploadedIds = new HashMap<>();
-        collection.distinct("_id", String.class).forEach(id -> uploadedIds.put(id, true));
+
+        collection.distinct("_id", String.class)
+                .forEach(id -> uploadedIds.put(id, true));
 
         var newProducts = productsToUpload.stream()
                 .filter(product -> !uploadedIds.containsKey(product.id()));

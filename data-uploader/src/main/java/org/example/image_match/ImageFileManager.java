@@ -22,8 +22,10 @@ public class ImageFileManager {
 
             return downloadedFile;
         } catch (IOException e) {
-            throw new IllegalArgumentException("File could not be downloaded." +
-                    "Invalid remote file URL: " + remoteFileUrl);
+            String errorMessage = "File could not be downloaded." + "Invalid remote file URL: " + remoteFileUrl;
+            System.out.println(errorMessage);
+
+            throw new IllegalArgumentException(errorMessage);
         }
     }
 

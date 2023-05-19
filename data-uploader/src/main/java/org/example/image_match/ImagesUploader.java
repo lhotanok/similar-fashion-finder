@@ -135,8 +135,8 @@ public class ImagesUploader extends ImageMatcherDbManager {
             }
         }
 
-        System.out.println("Waiting for 15 seconds before deleting temporarily downloaded image files");
-        Thread.sleep(15_000);
+        System.out.println("Waiting for 5 seconds before deleting temporarily downloaded image files");
+        Thread.sleep(5_000);
 
         downloadedImages.forEach(ImageFileManager::deleteFile);
         System.out.printf("All temporary files for %d thumbnail files were deleted%n", downloadedImages.size());

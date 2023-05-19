@@ -12,12 +12,18 @@ public class ImagesRetrieval extends ImageMatcherDbManager {
         super(sqlUsername, sqlPassword);
     }
     public PriorityQueue<Result<String>> getMatchingImages(String imageRemoteUrl) throws SQLException, IOException {
-        var exampleImageToBeMatched = ImageFileManager.downloadFile(
-                imageRemoteUrl,
-                buildTempFilename("image-to-match")
-        );
+        PriorityQueue<Result<String>> results = new PriorityQueue<>();
 
-        PriorityQueue<Result<String>> results = db.getMatchingImages(exampleImageToBeMatched);
+        try {
+            var exampleImageToBeMatched = ImageFileManager.downloadFile(
+                    imageRemoteUrl,
+                    buildTempFilename("image-to-match")
+            );
+
+            results = db.getMatchingImages(exampleImageToBeMatched);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
 
         System.out.printf("Matched %d images for '%s':%n", results.size(), imageRemoteUrl);
         results.forEach(System.out::println);

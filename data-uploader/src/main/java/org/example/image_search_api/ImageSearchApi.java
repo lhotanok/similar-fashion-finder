@@ -2,6 +2,8 @@ package org.example.image_search_api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -9,20 +11,28 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.example.image_match.ImagesRetrieval;
+import org.example.mongodb.ProductsRetrieval;
 
 import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.List;
 
 import static spark.Spark.get;
 
 public class ImageSearchApi {
     private static final String URL_BASED_SEARCH_PATH = "/imageMatcher";
     private final ImagesRetrieval imagesRetrieval;
+    private final ProductsRetrieval productsRetrieval;
+    private final ObjectMapper objectMapper;
 
-    public ImageSearchApi(String mysqlUsername, String mysqlPassword) throws SQLException {
+    public ImageSearchApi(
+            String mysqlUsername, String mysqlPassword, String mongoUsername, String mongoPassword
+    ) throws SQLException {
         imagesRetrieval = new ImagesRetrieval(mysqlUsername, mysqlPassword);
+        productsRetrieval = new ProductsRetrieval(mongoUsername, mongoPassword);
+        objectMapper = new ObjectMapper();
     }
 
     @Operation(
@@ -57,27 +67,24 @@ public class ImageSearchApi {
 
             var matchedImages = imagesRetrieval.getMatchingImages(decodedImageUrl);
 
+            System.out.printf("Extracted %d matching images%n", matchedImages.size());
+
             var matchedImageNames = matchedImages.stream()
                     .map(result -> new File(result.value).getName());
 
-            return convertImagesArrayToJson(
-                    matchedImageNames.toArray(String[]::new)
+            var matchedProductIds = matchedImageNames.map(
+                    fileName -> fileName.substring(0, fileName.lastIndexOf('.'))
             );
+
+            var products = productsRetrieval.fetchProducts(matchedProductIds.toList());
+
+            response.type("application/json");
+
+            return objectMapper.writeValueAsString(products);
         });
     }
 
     private static String decodeImageUrl(String imageUrl) {
         return URLDecoder.decode(imageUrl, StandardCharsets.UTF_8);
-    }
-
-    private static String convertImagesArrayToJson(String[] images) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        ArrayNode jsonArray = objectMapper.createArrayNode();
-
-        for (var image : images) {
-            jsonArray.add(image);
-        }
-
-        return jsonArray.toPrettyString();
     }
 }

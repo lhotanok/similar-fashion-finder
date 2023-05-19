@@ -8,7 +8,7 @@ import dev.brachtendorf.jimagehash.matcher.persistent.database.H2DatabaseImageMa
 
 import java.sql.SQLException;
 
-public class ImageMatcherDbManager  implements AutoCloseable {
+public class ImageMatcherDbManager implements AutoCloseable {
     protected static final String DB_NAME = "imageHashDB";
     protected H2DatabaseImageMatcher db;
 
