@@ -24,10 +24,16 @@ public class ProductsRetrieval extends ProductsDbManager {
         MongoCollection<ZalandoProduct> zalandoCollection = productsDb.getCollection(
                 ZALANDO_PRODUCTS_COLLECTION, ZalandoProduct.class);
 
+        System.out.println("Loaded all collections");
         List<DatasetBaseProduct> products = new ArrayList<>();
 
         var zootProducts = fetchProductsFromCollection(ids, zootCollection);
+        System.out.printf("Fetched %d products from '%s' collection%n", zootProducts.size(),
+                ZOOT_PRODUCTS_COLLECTION);
+
         var zalandoProducts = fetchProductsFromCollection(ids, zalandoCollection);
+        System.out.printf("Fetched %d products from '%s' collection%n", zalandoProducts.size(),
+                ZALANDO_PRODUCTS_COLLECTION);
 
         products.addAll(zootProducts);
         products.addAll(zalandoProducts);
@@ -39,6 +45,8 @@ public class ProductsRetrieval extends ProductsDbManager {
             List<String> ids, MongoCollection<ProductType> collection
     ) {
         Document query = new Document("_id", new Document("$in", ids));
+
+        System.out.println("Fetching documents based on IDs with query: " + query.toJson());
 
         return collection.find(query)
                 .into(new ArrayList<>());

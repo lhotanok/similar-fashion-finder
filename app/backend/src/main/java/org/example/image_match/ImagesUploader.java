@@ -1,7 +1,5 @@
 package org.example.image_match;
 
-import dev.brachtendorf.jimagehash.datastructures.tree.Result;
-import dev.brachtendorf.jimagehash.matcher.persistent.database.H2DatabaseImageMatcher;
 import org.example.DatasetBaseProduct;
 import org.example.ZalandoProduct;
 import org.example.ZootProduct;
@@ -12,7 +10,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.concurrent.*;
 
 public class ImagesUploader extends ImageMatcherDbManager {
@@ -20,23 +17,25 @@ public class ImagesUploader extends ImageMatcherDbManager {
 
     public ImagesUploader(String sqlUsername, String sqlPassword) throws SQLException {
         super(sqlUsername, sqlPassword);
+
+        // recreateImageMatcherDb();
     }
 
     public void uploadProductImages() throws IOException, SQLException, InterruptedException {
-        for (File zalandoFile: DatasetDeserializer.getZalandoDatasetFiles()) {
-            List<ZalandoProduct> zalandoProducts = DatasetDeserializer.deserializeJsonCollection(
-                    zalandoFile, ZalandoProduct.class
-            );
-
-            uploadThumbnailHashesToDbParallel(zalandoProducts);
-        }
-
         for (File zootFile: DatasetDeserializer.getZootDatasetFiles()) {
             List<ZootProduct> zootProducts = DatasetDeserializer.deserializeJsonCollection(
                     zootFile, ZootProduct.class
             );
 
             uploadThumbnailHashesToDbParallel(zootProducts);
+        }
+
+        for (File zalandoFile: DatasetDeserializer.getZalandoDatasetFiles()) {
+            List<ZalandoProduct> zalandoProducts = DatasetDeserializer.deserializeJsonCollection(
+                    zalandoFile, ZalandoProduct.class
+            );
+
+            uploadThumbnailHashesToDbParallel(zalandoProducts);
         }
     }
 
@@ -46,7 +45,8 @@ public class ImagesUploader extends ImageMatcherDbManager {
 
             System.out.printf("Downloading thumbnail images of %d products in parallel%n", products.size());
 
-            List<Future<File>> futures = new ArrayList<>();
+            // List<Future<File>> futures = new ArrayList<>();
+            List<Callable<File>> callables = new ArrayList<>();
 
             for (var product: products) {
                 if (product.thumbnail() == null) {
@@ -58,15 +58,18 @@ public class ImagesUploader extends ImageMatcherDbManager {
                         buildTempFilename(product.id())
                 );
 
-                Future<File> future = executorService.submit(callable);
-                futures.add(future);
+                callables.add(callable);
+
+                /*Future<File> future = executorService.submit(callable);
+                futures.add(future);*/
             }
 
+            List<Future<File>> futures = executorService.invokeAll(callables);
             List<File> downloadedImages = new ArrayList<>();
 
             for (Future<File> future : futures) {
                 try {
-                    File downloadedImage = future.get();
+                    File downloadedImage = future.get(); // blocking call
                     downloadedImages.add(downloadedImage);
                 } catch (IllegalArgumentException e) {
                     System.out.println(e.getMessage());
@@ -75,7 +78,7 @@ public class ImagesUploader extends ImageMatcherDbManager {
                 }
             }
 
-            processDownloadedImage(downloadedImages);
+            processDownloadedImages(downloadedImages);
 
             executorService.shutdown();
         }
@@ -104,13 +107,13 @@ public class ImagesUploader extends ImageMatcherDbManager {
             }
         }
 
-        processDownloadedImage(downloadedImages);
+        processDownloadedImages(downloadedImages);
     }
 
-    private void processDownloadedImage(List<File> downloadedImages)
+    private void processDownloadedImages(List<File> downloadedImages)
             throws SQLException, IOException, InterruptedException {
         System.out.printf(
-                "Uploading hashes for %d images to MySQL database '%s'%n",
+                "Uploading hashes for %d images to H2 database '%s'%n",
                 downloadedImages.size(),
                 ImageMatcherDbManager.DB_NAME
         );
@@ -125,10 +128,10 @@ public class ImagesUploader extends ImageMatcherDbManager {
         for (File image : downloadedImages) {
             try {
                 db.addImage(image);
-                System.out.println("Uploaded a new image to MySQL image matching DB: " + image.getName());
+                System.out.println("Uploaded a new image to H2 image matching DB: " + image.getName());
             } catch (Exception e) {
                 System.out.printf(
-                        "Image '%s' could not be uploaded to MySQL image matching DB, message: %s%n",
+                        "Image '%s' could not be uploaded to H2 image matching DB, message: %s%n",
                         image.getName(),
                         e.getMessage()
                 );

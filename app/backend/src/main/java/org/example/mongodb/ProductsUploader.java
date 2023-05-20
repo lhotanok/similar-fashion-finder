@@ -63,7 +63,10 @@ public class ProductsUploader extends ProductsDbManager {
         System.out.println("Loaded products: " + products.size());
 
         List<ProductType> productsToUpload = filterNewProducts(products, collection);
-        System.out.println(productsToUpload.size() + " products will be uploaded");
+        System.out.println(
+                collection.countDocuments() + " products are currently uploaded in the collection: " + collectionName
+        );
+        System.out.println(productsToUpload.size() + " new products will be uploaded");
 
         if (productsToUpload.size() == 0) {
             return;

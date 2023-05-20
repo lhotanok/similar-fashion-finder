@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-import static org.example.image_search_api.SwaggerConfiguration.preInitializeSwagger;
 import static org.example.image_search_api.SwaggerConfiguration.setupSwagger;
 
 public class App
@@ -16,12 +15,12 @@ public class App
     private static final String DEFAULT_MONGO_DB_USERNAME = "fashion";
     private static final String DEFAULT_MONGO_DB_PASSWORD = "1234";
 
-    private static final String DEFAULT_MYSQL_DB_USERNAME = "admin";
-    private static final String DEFAULT_MYSQL_DB_PASSWORD = "admin";
+    private static final String DEFAULT_H2_DB_USERNAME = "admin";
+    private static final String DEFAULT_H2_DB_PASSWORD = "admin";
 
     public static void main(String[] args) {
         System.out.println(
-                "Program args (expecting arguments mongoUsername, mongoPassword, mysqlUsername and mysqlPassword" +
+                "Program args (expecting arguments mongoUsername, mongoPassword, h2Username and h2Password" +
                         " in this order, otherwise using default credentials for both DBs): " + Arrays.toString(args));
 
         String mongoUsername = args.length > 0 ? args[0] : DEFAULT_MONGO_DB_USERNAME;
@@ -29,16 +28,16 @@ public class App
 
         System.out.printf("Mongo DB username: %s, password: %s%n", mongoUsername, mongoPassword);
 
-        String mysqlUsername = args.length > 2 ? args[2] : DEFAULT_MYSQL_DB_USERNAME;
-        String mysqlPassword = args.length > 3 ? args[3] : DEFAULT_MYSQL_DB_PASSWORD;
-        System.out.printf("MySQL username: %s, password: %s%n", mysqlUsername, mysqlPassword);
+        String h2Username = args.length > 2 ? args[2] : DEFAULT_H2_DB_USERNAME;
+        String h2Password = args.length > 3 ? args[3] : DEFAULT_H2_DB_PASSWORD;
+        System.out.printf("H2 DB username: %s, password: %s%n", h2Username, h2Password);
+
+        setupSwagger();
 
         uploadProductsToMongo(mongoUsername, mongoPassword);
-        uploadImagesToMySql(mysqlUsername, mysqlPassword);
+        uploadImagesToH2Db(h2Username, h2Password);
 
-        preInitializeSwagger();
-        setupImageSearchApi(mysqlUsername, mysqlPassword, mongoUsername, mongoPassword);
-        setupSwagger();
+        setupImageSearchApi(h2Username, h2Password, mongoUsername, mongoPassword);
     }
 
     private static void uploadProductsToMongo(String mongoUsername, String mongoPassword) {
@@ -49,12 +48,12 @@ public class App
         }
     }
 
-    private static void uploadImagesToMySql(String mysqlUsername, String mysqlPassword) {
+    private static void uploadImagesToH2Db(String mysqlUsername, String mysqlPassword) {
         try (var imagesUploader = new ImagesUploader(mysqlUsername, mysqlPassword)) {
             imagesUploader.uploadProductImages();
         } catch (SQLException e) {
             throw new IllegalArgumentException(
-                    "Invalid credentials for MySQL database provided, full message: " + e.getMessage()
+                    "Invalid credentials for H2 database provided, full message: " + e.getMessage()
             );
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -62,20 +61,20 @@ public class App
     }
 
     private static void setupImageSearchApi(
-            String mysqlUsername,
-            String mysqlPassword,
+            String h2Username,
+            String h2Password,
             String mongoUsername,
             String mongoPassword
     ) {
         try {
             var imageSearchApi = new ImageSearchApi(
-                    mysqlUsername, mysqlPassword, mongoUsername, mongoPassword
+                    h2Username, h2Password, mongoUsername, mongoPassword
             );
 
             imageSearchApi.setupUrlBasedSearchEndpoint();
         } catch (SQLException e) {
             throw new IllegalArgumentException(
-                    "Invalid credentials for MySQL database provided, full message: " + e.getMessage()
+                    "Invalid credentials for H2 database provided, full message: " + e.getMessage()
             );
         } catch (Exception e) {
             throw new RuntimeException(e);

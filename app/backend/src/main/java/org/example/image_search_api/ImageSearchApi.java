@@ -1,28 +1,41 @@
 package org.example.image_search_api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import dev.brachtendorf.jimagehash.datastructures.tree.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.example.DatasetBaseProduct;
 import org.example.image_match.ImagesRetrieval;
 import org.example.mongodb.ProductsRetrieval;
+import spark.Request;
+import spark.Response;
 
 import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 
 import static spark.Spark.get;
 
 public class ImageSearchApi {
     private static final String URL_BASED_SEARCH_PATH = "/imageMatcher";
+    private static final int MAX_PRODUCTS_IN_RESPONSE = 500;
+    private static final String IMAGE_MATCH_ERROR_MESSAGE = "We are sorry for the inconvenience" +
+            " but image matching failed. Please, try your request later.";
+
+    private static final String PRODUCTS_RETRIEVAL_ERROR_MESSAGE = "We are sorry for the inconvenience" +
+            " but matching products could not be retrieved. Please, try your request later.";
     private final ImagesRetrieval imagesRetrieval;
     private final ProductsRetrieval productsRetrieval;
     private final ObjectMapper objectMapper;
@@ -52,39 +65,99 @@ public class ImageSearchApi {
             responseCode = "200",
             description = "List of matched image names",
             content = @Content(schema = @Schema(
-                    type = "array",
-                    example = "[\"image1.jpg\", \"image2.jpg\"]"
+                    type = "array"
             ))
     )
     public void setupUrlBasedSearchEndpoint() {
         System.out.println("Setting up API endpoint for URL based image search: " + URL_BASED_SEARCH_PATH);
 
         get(URL_BASED_SEARCH_PATH, (request, response) -> {
-            String imageUrl = request.queryParams("imageUrl");
-
-            String decodedImageUrl = decodeImageUrl(imageUrl);
-            System.out.println("Searching similar images for imageUrl: " + decodedImageUrl);
-
-            var matchedImages = imagesRetrieval.getMatchingImages(decodedImageUrl);
-
-            System.out.printf("Extracted %d matching images%n", matchedImages.size());
-
-            var matchedImageNames = matchedImages.stream()
-                    .map(result -> new File(result.value).getName());
-
-            var matchedProductIds = matchedImageNames.map(
-                    fileName -> fileName.substring(0, fileName.lastIndexOf('.'))
-            );
-
-            var products = productsRetrieval.fetchProducts(matchedProductIds.toList());
-
             response.type("application/json");
 
-            return objectMapper.writeValueAsString(products);
+            String imageUrl = getDecodeImageUrl(request);
+
+            PriorityQueue<Result<String>> matchedImages;
+            try {
+                matchedImages = imagesRetrieval.getMatchingImages(imageUrl);
+            } catch (Exception e) {
+                return reportServerError(e, response, IMAGE_MATCH_ERROR_MESSAGE);
+            }
+
+            System.out.printf("Extracted %d matching images%n", matchedImages.size());
+            var matchedProductIds = parseMatchedProductIds(matchedImages);
+
+            List<DatasetBaseProduct> products;
+            try {
+                products = productsRetrieval.fetchProducts(matchedProductIds);
+            } catch (Exception e) {
+                return reportServerError(e, response, PRODUCTS_RETRIEVAL_ERROR_MESSAGE);
+            }
+
+            try {
+                var responseItems = buildResponseItems(products, matchedImages);
+                return objectMapper.writeValueAsString(responseItems);
+            } catch (Exception e) {
+                return reportServerError(e, response, PRODUCTS_RETRIEVAL_ERROR_MESSAGE);
+            }
         });
+    }
+
+    private static List<String> parseMatchedProductIds (PriorityQueue<Result<String>> matchedImages) {
+        var matchedImageNames = matchedImages.stream()
+                .map(result -> new File(result.value).getName());
+
+        return matchedImageNames.map(
+                fileName -> fileName.substring(0, fileName.lastIndexOf('.'))
+        ).toList();
+    }
+
+    private static String getDecodeImageUrl (Request request) {
+        String imageUrl = request.queryParams("imageUrl");
+
+        String decodedImageUrl = decodeImageUrl(imageUrl);
+        System.out.println("Searching similar images for imageUrl: " + decodedImageUrl);
+
+        return decodedImageUrl;
+    }
+
+    private String reportServerError(Exception e, Response response, String message) throws JsonProcessingException {
+        e.printStackTrace();
+        response.status(500);
+
+        return objectMapper.writeValueAsString(
+                new Error(message)
+        );
     }
 
     private static String decodeImageUrl(String imageUrl) {
         return URLDecoder.decode(imageUrl, StandardCharsets.UTF_8);
+    }
+
+    private static List<ProductMatch> buildResponseItems (
+            List<? extends DatasetBaseProduct> products,
+            PriorityQueue<Result<String>> matches
+    ) {
+        var matchedImages = matches.stream().toList();
+
+        var responseProductsCount = Math.min(products.size(), MAX_PRODUCTS_IN_RESPONSE);
+
+        var productsToReturn = products.subList(0, responseProductsCount);
+
+        List<ProductMatch> responseItems = new ArrayList<>();
+
+        for (int i = 0; i < productsToReturn.size(); i++) {
+            var product = productsToReturn.get(i);
+            var match = matchedImages.get(i);
+
+            responseItems.add(
+                    new ProductMatch(
+                            match.distance,
+                            match.normalizedHammingDistance,
+                            product
+                    )
+            );
+        }
+
+        return responseItems;
     }
 }

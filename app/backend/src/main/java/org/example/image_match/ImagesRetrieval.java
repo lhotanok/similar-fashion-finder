@@ -8,8 +8,8 @@ import java.util.PriorityQueue;
 
 public class ImagesRetrieval extends ImageMatcherDbManager {
 
-    public ImagesRetrieval(String sqlUsername, String sqlPassword) throws SQLException {
-        super(sqlUsername, sqlPassword);
+    public ImagesRetrieval(String h2Username, String h2Password) throws SQLException {
+        super(h2Username, h2Password);
     }
     public PriorityQueue<Result<String>> getMatchingImages(String imageRemoteUrl) throws SQLException, IOException {
         PriorityQueue<Result<String>> results = new PriorityQueue<>();

@@ -6,16 +6,15 @@ import io.swagger.v3.oas.models.info.Info;
 import static spark.Spark.*;
 
 public class SwaggerConfiguration {
-    public static void preInitializeSwagger() {
-        staticFiles.location("/swagger");
-        redirect.get("/", "/swagger/index.html");
-        redirect.get("/swagger", "/swagger/index.html");
-    }
     public static void setupSwagger() {
         OpenAPI openApi = new OpenAPI()
                 .info(new Info().title("Image Matcher API").version("1.0"));
 
         System.out.println("Setting up Swagger: " + openApi.getOpenapi());
+
+        staticFiles.location("/swagger");
+        redirect.get("/", "/swagger/index.html");
+        redirect.get("/swagger", "/swagger/index.html");
 
         setupSwaggerJsonEndpoint(openApi);
         setupSwaggerUiEndpoint(openApi);

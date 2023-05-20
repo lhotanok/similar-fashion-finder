@@ -1,9 +1,6 @@
 package org.example.image_match;
 
-import dev.brachtendorf.jimagehash.hashAlgorithms.AverageColorHash;
-import dev.brachtendorf.jimagehash.hashAlgorithms.AverageHash;
-import dev.brachtendorf.jimagehash.hashAlgorithms.DifferenceHash;
-import dev.brachtendorf.jimagehash.hashAlgorithms.PerceptiveHash;
+import dev.brachtendorf.jimagehash.hashAlgorithms.*;
 import dev.brachtendorf.jimagehash.matcher.persistent.database.H2DatabaseImageMatcher;
 
 import java.sql.SQLException;
@@ -12,8 +9,13 @@ public class ImageMatcherDbManager implements AutoCloseable {
     protected static final String DB_NAME = "imageHashDB";
     protected H2DatabaseImageMatcher db;
 
-    public ImageMatcherDbManager(String sqlUsername, String sqlPassword) throws SQLException {
-        db = ImageMatcherDbManager.getImageMatcherDbConnection(sqlUsername, sqlPassword);
+    private final String h2Username;
+    private final String h2Password;
+    public ImageMatcherDbManager(String h2Username, String h2Password) throws SQLException {
+        this.h2Username = h2Username;
+        this.h2Password = h2Password;
+
+        initializeImageMatcherDbConnection();
     }
 
     @Override
@@ -21,30 +23,42 @@ public class ImageMatcherDbManager implements AutoCloseable {
         System.out.println("Closing connection to MySQL database with images");
         db.close();
     }
-    private static H2DatabaseImageMatcher getImageMatcherDbConnection(
-            String sqlUsername, String sqlPassword
-    ) throws SQLException {
-        var db = new H2DatabaseImageMatcher(DB_NAME, sqlUsername, sqlPassword);
+
+    protected void initializeImageMatcherDbConnection() throws SQLException {
+        db = new H2DatabaseImageMatcher(DB_NAME, h2Username, h2Password);
 
         db.clearHashingAlgorithms(true);
-        initializeMatchingAlgorithms(db);
-
-        return db;
+        initializeMatchingAlgorithms();
     }
 
-    private static void initializeMatchingAlgorithms(H2DatabaseImageMatcher db) {
+    protected void recreateImageMatcherDb() throws SQLException{
+        try(var db = new H2DatabaseImageMatcher(DB_NAME, h2Username, h2Password)) {
+            System.out.println("Deleting image hashing database: " + DB_NAME);
+            db.deleteDatabase();
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        initializeImageMatcherDbConnection();
+    }
+
+    private void initializeMatchingAlgorithms() {
         System.out.println(
-                "Initializing image matching MySQL database with hashing algorithms: " +
-                        "AverageHash, " +
-                        "AverageColorHash, " +
-                        "DifferenceHash, " +
-                        "PerceptiveHash"
+                "Initializing image matching H2 database with hashing algorithms: " +
+                        "AverageHash, AverageColorHash, DifferenceHash, PerceptiveHash, " +
+                        "WaveletHash, RotAverageHash, RotPHash"
         );
 
-        db.addHashingAlgorithm(new AverageColorHash(64), 0.4);
-        db.addHashingAlgorithm(new AverageHash(64), 0.3);
-        db.addHashingAlgorithm(new DifferenceHash(64, DifferenceHash.Precision.Simple), 0.4);
+        // threshold closer to 0 is stricter on images
+
+        db.addHashingAlgorithm(new AverageColorHash(64), 0.20);
+        db.addHashingAlgorithm(new WaveletHash(64, 10), 0.25);
+        db.addHashingAlgorithm(new AverageHash(64), 0.45);
+        db.addHashingAlgorithm(new DifferenceHash(64, DifferenceHash.Precision.Simple), 0.5);
         db.addHashingAlgorithm(new PerceptiveHash(64), 0.4);
+        db.addHashingAlgorithm(new RotAverageHash(64), 0.5);
+        db.addHashingAlgorithm(new RotPHash(64), 0.5);
+
     }
 
     protected String buildTempFilename (String filename) {

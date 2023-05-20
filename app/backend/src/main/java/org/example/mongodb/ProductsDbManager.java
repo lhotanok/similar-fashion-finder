@@ -13,12 +13,7 @@ public class ProductsDbManager implements AutoCloseable {
     protected static final String ZALANDO_PRODUCTS_COLLECTION = "zalando-products";
 
     public ProductsDbManager(String dbUsername, String dbPassword) {
-        connectionUri = String.format(
-                "mongodb://%s:%s@localhost:27017/%s?authSource=admin",
-                dbUsername,
-                dbPassword,
-                DB_NAME
-        );
+        connectionUri = buildConnectionString(dbUsername, dbPassword);
 
         System.out.println("Creating client with Mongo connection URI: " + connectionUri);
         client = MongoClients.create(connectionUri);
@@ -32,5 +27,25 @@ public class ProductsDbManager implements AutoCloseable {
     public void close() {
         System.out.println("Closing connection to MongoDB with products");
         client.close();
+    }
+
+    private String buildConnectionString(String dbUsername, String dbPassword) {
+        String hostname = getHostname();
+
+        return String.format(
+                "mongodb://%s:%s@%s:27017/%s?authSource=admin",
+                dbUsername,
+                dbPassword,
+                hostname,
+                DB_NAME
+        );
+    }
+
+    private String getHostname() {
+        String mongoHost = System.getenv("MONGO_HOST");
+
+        return mongoHost != null && !mongoHost.isEmpty()
+                ? mongoHost
+                : "localhost";
     }
 }
