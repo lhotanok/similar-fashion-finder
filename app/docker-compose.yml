@@ -5,7 +5,7 @@ services:
     restart: always
     container_name: mongo
     ports:
-      - 127.0.0.1:27017:27017  # Bind MongoDB to localhost
+      - "127.0.0.1:${MONGO_PORT}:${MONGO_PORT}"  # Bind MongoDB to localhost
     environment:
       MONGO_INITDB_ROOT_USERNAME: fashion
       MONGO_INITDB_ROOT_PASSWORD: 1234
@@ -17,7 +17,7 @@ services:
     restart: always
     environment:
       ME_CONFIG_MONGODB_SERVER: mongo
-      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_PORT: ${MONGO_PORT}
       ME_CONFIG_MONGODB_ADMINUSERNAME: fashion
       ME_CONFIG_MONGODB_ADMINPASSWORD: 1234
       ME_CONFIG_BASICAUTH_USERNAME: admin
@@ -26,13 +26,14 @@ services:
     depends_on:
       - mongo
     ports:
-      - 127.0.0.1:8081:8081 # Bind Mongo Express to localhost
+      - "127.0.0.1:${MONGO_EXPRESS_PORT}:${MONGO_EXPRESS_PORT}" # Bind Mongo Express to localhost
     networks:
       - network
 
   backend:
     environment:
       MONGO_HOST: mongo
+      MONGO_PORT: ${MONGO_PORT}
     build:
       context: backend
       dockerfile: Dockerfile
@@ -40,7 +41,7 @@ services:
       - mongo
     restart: always
     ports:
-      - 127.0.0.1:4567:4567  # Bind backend to localhost
+      - "127.0.0.1:${BACKEND_PORT}:${BACKEND_PORT}"  # Bind backend to localhost
     networks:
       - network
 
@@ -50,7 +51,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - 127.0.0.1:3000:3000  # Bind frontend to localhost
+      - "127.0.0.1:${FRONTEND_PORT}:${FRONTEND_PORT}"  # Bind frontend to localhost
     networks:
       - network
 
