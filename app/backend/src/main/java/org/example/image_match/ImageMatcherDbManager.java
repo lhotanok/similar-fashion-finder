@@ -45,19 +45,19 @@ public class ImageMatcherDbManager implements AutoCloseable {
     private void initializeMatchingAlgorithms() {
         System.out.println(
                 "Initializing image matching H2 database with hashing algorithms: " +
-                        "AverageHash, AverageColorHash, DifferenceHash, PerceptiveHash, " +
-                        "WaveletHash, RotAverageHash, RotPHash"
+                        "DifferenceHash, PerceptiveHash, WaveletHash, RotPHash"
         );
 
         // threshold closer to 0 is stricter on images
 
-        db.addHashingAlgorithm(new AverageColorHash(64), 0.20);
-        db.addHashingAlgorithm(new WaveletHash(64, 10), 0.25);
-        db.addHashingAlgorithm(new AverageHash(64), 0.45);
-        db.addHashingAlgorithm(new DifferenceHash(64, DifferenceHash.Precision.Simple), 0.5);
-        db.addHashingAlgorithm(new PerceptiveHash(64), 0.4);
-        db.addHashingAlgorithm(new RotAverageHash(64), 0.5);
-        db.addHashingAlgorithm(new RotPHash(64), 0.5);
+        db.addHashingAlgorithm(new WaveletHash(64, 4), 0.3);
+        // db.addHashingAlgorithm(new AverageColorHash(64), 0.20);
+        // db.addHashingAlgorithm(new AverageHash(64), 0.45);
+        db.addHashingAlgorithm(new DifferenceHash(64, DifferenceHash.Precision.Simple), 0.35);
+        db.addHashingAlgorithm(new PerceptiveHash(64), 0.25);
+        // db.addHashingAlgorithm(new RotAverageHash(64), 0.5);
+        db.addHashingAlgorithm(new RotPHash(64), 0.35);
+
 
     }
 

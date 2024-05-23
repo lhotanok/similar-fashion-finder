@@ -2,6 +2,7 @@ package org.example.image_match;
 
 import dev.brachtendorf.jimagehash.datastructures.tree.Result;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.PriorityQueue;
@@ -15,12 +16,13 @@ public class ImagesRetrieval extends ImageMatcherDbManager {
         PriorityQueue<Result<String>> results = new PriorityQueue<>();
 
         try {
-            var exampleImageToBeMatched = ImageFileManager.downloadFile(
+            File exampleImageToBeMatched = ImageFileManager.downloadFile(
                     imageRemoteUrl,
                     buildTempFilename("image-to-match")
             );
 
-            results = db.getMatchingImages(exampleImageToBeMatched);
+            File transformedImage = ImageTransformation.transform(exampleImageToBeMatched);
+            results = db.getMatchingImages(transformedImage);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
