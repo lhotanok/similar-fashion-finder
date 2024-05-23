@@ -16,18 +16,17 @@ Web application for searching fashion products by images 👗📷
 The application uses 2 databases internally:
 
 - **MongoDB** for rich product data
-- **MySQL** for image hashes
+- **H2 Database** for image hashes (used internally by [JImageHash](https://github.com/KilianB/JImageHash) library)
 
-Both databases can be easily configured using Docker Compose tool. Just run the following command from `app` directory:
+Mongo database will be configured with Docker Compose. Simply run the following command from `app` directory:
 
 `docker-compose up -d`
 
-This command will run Docker Compose in a detached mode and it will set up MongoDB, MySQL and their corresponding web interfaces Mongo Express and phpMyAdmin. Web interfaces will be accessible on their default locations and ports:
+This command will run Docker Compose in a detached mode and it will set up MongoDB and its corresponding web interface Mongo Express. Web interface will be accessible on its default location and port:
 
 - Mongo Express
   - Database `products`: `http://localhost:8081/mongo-express/db/products/`
-- phpMyAdmin 
-  - `http://localhost:8080/` with username `root` and password `admin`
+  - Default credentials: `admin` username, `admin` password
 
 ### Backend
 
@@ -35,9 +34,9 @@ Backend code is gathered in `app/backend` directory. You'll find a single Java c
 
 The application can be built and run with Maven using the corresponding commands directly or through an IDE such as IntelliJ IDEA or Eclipse.
 
-The process of data uploading can take longer based on the amount of products you choose to upload. JSON files with fashion products from Zalando and Zoot websites are expected to be stored in `backend/src/main/resources/datasets/`  in `zalando` and `zoot` subdirectories. There're already a few product examples to make the application running quickly. More products can be found in `app/backend/datasets` directory. The latest data can be extracted using the open source Apify actors:
+The process of data uploading can take longer based on the amount of products you choose to upload. JSON files with fashion products from Zalando and Zoot websites are expected to be stored in `backend/src/main/resources/datasets/`  in `zalando` and `zoot` subdirectories. There're already a few product examples to make the application running quickly. More products can be found in `app/backend/datasets/data` directory. The latest data can be extracted using the open source Apify actors:
 
-- [Zalando Scraper](https://apify.com/lhotanok/zalando-scraper)
-- [Zoot Scraper](https://apify.com/lhotanok/zoot-scraper)
+- [Zalando Scraper](https://apify.com/lhotanova/zalando-scraper)
+- [Zoot Scraper](https://apify.com/lhotanova/zoot-scraper)
 
 ### Frontend
