@@ -2,13 +2,14 @@ package org.example.image_search_api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import dev.brachtendorf.jimagehash.datastructures.tree.Result;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -18,6 +19,8 @@ import org.example.mongodb.ProductsRetrieval;
 import spark.Request;
 import spark.Response;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -28,6 +31,15 @@ import java.util.PriorityQueue;
 
 import static spark.Spark.get;
 
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Image Matcher API",
+                version = "1.0",
+                description = "This API enables users to search for similar images based on the URL of the image.",
+                license = @License(name = "MIT", url = "https://opensource.org/licenses/MIT"),
+                contact = @Contact(url = "https://github.com/lhotanok/similar-fashion-finder", name = "Kristýna Lhoťanová")
+        )
+)
 public class ImageSearchApi {
     private static final String URL_BASED_SEARCH_PATH = "/imageMatcher";
     private static final int MAX_PRODUCTS_IN_RESPONSE = 500;
@@ -48,6 +60,8 @@ public class ImageSearchApi {
         objectMapper = new ObjectMapper();
     }
 
+    @GET
+    @Path(URL_BASED_SEARCH_PATH)
     @Operation(
             summary = "URL Based Image Search",
             parameters = {
@@ -56,17 +70,19 @@ public class ImageSearchApi {
                             description = "The URL of the image to be used for search of similar images",
                             in = ParameterIn.QUERY,
                             required = true,
-                            example = "https://img01.ztat.net/article/spp-media-p1/4d886b16c24641208f2f592f6bfb4208/50d0758fc3b840daa4e4ff4c35144371.jpg?imwidth=1800"
+                            example = "https://www.mall.cz/i/108493875/1000/1000"
                     )
             },
-            description = "Searches for similar images based on the provided image URL."
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "List of matched image names",
-            content = @Content(schema = @Schema(
-                    type = "array"
-            ))
+            description = "Searches for similar images based on the provided image URL.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "List of matched image names",
+                            content = @Content(schema = @Schema(
+                                    type = "array"
+                            ))
+                    )
+            }
     )
     public void setupUrlBasedSearchEndpoint() {
         System.out.println("Setting up API endpoint for URL based image search: " + URL_BASED_SEARCH_PATH);
