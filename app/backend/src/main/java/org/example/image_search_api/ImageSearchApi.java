@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.example.DatasetBaseProduct;
 import org.example.image_match.ImagesRetrieval;
 import org.example.mongodb.ProductsRetrieval;
@@ -40,6 +41,7 @@ import static spark.Spark.get;
                 contact = @Contact(url = "https://github.com/lhotanok/similar-fashion-finder", name = "Kristýna Lhoťanová")
         )
 )
+@Tag(name = "Similar Products", description = "Fetching similar products based on the image URL.")
 public class ImageSearchApi {
     private static final String URL_BASED_SEARCH_PATH = "/imageMatcher";
     private static final int MAX_PRODUCTS_IN_RESPONSE = 500;
