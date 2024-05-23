@@ -57,8 +57,6 @@ public class ImageMatcherDbManager implements AutoCloseable {
         db.addHashingAlgorithm(new PerceptiveHash(64), 0.25);
         // db.addHashingAlgorithm(new RotAverageHash(64), 0.5);
         db.addHashingAlgorithm(new RotPHash(64), 0.35);
-
-
     }
 
     protected String buildTempFilename (String filename) {
