@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.image_match.ImagesUploader;
+import org.example.image_search_api.CorsFilter;
 import org.example.image_search_api.ImageSearchApi;
 import org.example.mongodb.ProductsUploader;
 
@@ -66,6 +67,8 @@ public class App
             String mongoUsername,
             String mongoPassword
     ) {
+        CorsFilter.apply();
+
         try {
             var imageSearchApi = new ImageSearchApi(
                     h2Username, h2Password, mongoUsername, mongoPassword
