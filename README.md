@@ -40,3 +40,7 @@ The process of data uploading can take longer based on the amount of products yo
 - [Zoot Scraper](https://apify.com/lhotanova/zoot-scraper)
 
 ### Frontend
+
+Frontend code is stored in `app/frontend` directory. It is a single page React application where users can provide image URL and this URL is used as a parameter in search for same or at least similar products.
+
+The application is accessible on `http://localhost:3000` and it is deployed with `docker-compose up -d` command along with MongoDB and backend application. It can also be started individually by running `npm start` from the `app/frontend` directory. 
