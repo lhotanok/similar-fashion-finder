@@ -30,7 +30,7 @@ export default function ProductCard({product}: {product: Product}) {
               {product.name}
             </Typography>
             <Typography variant='subtitle1' color='text.secondary' component='div'>
-              Sizes: {parseAvailableSizes(product).join(', ')}
+              Available sizes: {parseAvailableSizes(product).join(', ')}
             </Typography>
           </CardContent>
           <Box sx={{display: 'flex', alignItems: 'center', pl: 2, pb: 1}}>
@@ -40,7 +40,7 @@ export default function ProductCard({product}: {product: Product}) {
           </Box>
           <CardMedia
             component='img'
-            sx={{maxHeight: '50vh', objectFit: 'cover', objectPosition: 'top'}}
+            sx={{maxHeight: '50vh', objectFit: 'cover', objectPosition: '20% 20%'}}
             image={product.thumbnail}
             alt={product.name}
           />
