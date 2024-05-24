@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"org.example"},{"l":"org.example.dataset_products"},{"l":"org.example.image_match"},{"l":"org.example.image_search_api"},{"l":"org.example.mongodb"}];updateSearchResults();
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"cz.cuni.mff"},{"l":"cz.cuni.mff.dataset_products"},{"l":"cz.cuni.mff.image_match"},{"l":"cz.cuni.mff.image_search_api"},{"l":"cz.cuni.mff.mongodb"}];updateSearchResults();

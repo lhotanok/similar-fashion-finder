@@ -1,5 +1,5 @@
-org.example
-org.example.dataset_products
-org.example.image_match
-org.example.image_search_api
-org.example.mongodb
+cz.cuni.mff
+cz.cuni.mff.dataset_products
+cz.cuni.mff.image_match
+cz.cuni.mff.image_search_api
+cz.cuni.mff.mongodb

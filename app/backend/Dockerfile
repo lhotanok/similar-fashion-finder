@@ -10,4 +10,4 @@ COPY src/ ./src/
 
 RUN mvn clean package
 
-CMD ["java", "-cp", "target/backend-jar-with-dependencies.jar", "org.example.App"]
+CMD ["java", "-cp", "target/backend-jar-with-dependencies.jar", "cz.cuni.mff.App"]
