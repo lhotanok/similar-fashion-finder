@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 
+/**
+ * Main class of the Similar Fashion Finder application, responsible for orchestrating the whole process.
+ */
 public class App
 {
     private static final String DEFAULT_MONGO_DB_USERNAME = "fashion";
@@ -40,6 +43,13 @@ public class App
         setupImageSearchApi(h2Username, h2Password, mongoUsername, mongoPassword);
     }
 
+    /**
+     * Uploads new product items from JSON resource files to MongoDB collections.
+     * Each product item is represented by a separate MongoDB document.
+     *
+     * @param mongoUsername username for MongoDB
+     * @param mongoPassword password for MongoDB
+     */
     private static void uploadProductsToMongo(String mongoUsername, String mongoPassword) {
         try (var productsUploader = new ProductsUploader(mongoUsername, mongoPassword)) {
             productsUploader.uploadNewProducts();
@@ -48,6 +58,14 @@ public class App
         }
     }
 
+    /**
+     * Uploads main product images to H2 database.
+     * The images are downloaded using the URLs provided in the product JSON files.
+     * Uploaded images are to be used for image-based product search.
+     *
+     * @param mysqlUsername username for H2 database
+     * @param mysqlPassword password for H2 database
+     */
     private static void uploadImagesToH2Db(String mysqlUsername, String mysqlPassword) {
         try (var imagesUploader = new ImagesUploader(mysqlUsername, mysqlPassword)) {
             imagesUploader.uploadProductImages();
@@ -60,6 +78,15 @@ public class App
         }
     }
 
+    /**
+     * Sets up the image search API, which provides endpoints for image-based product search.
+     * The API is built on top of the Spark framework.
+     *
+     * @param h2Username username for H2 database
+     * @param h2Password password for H2 database
+     * @param mongoUsername username for MongoDB
+     * @param mongoPassword password for MongoDB
+     */
     private static void setupImageSearchApi(
             String h2Username,
             String h2Password,

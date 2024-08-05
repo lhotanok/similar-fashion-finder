@@ -3,9 +3,9 @@ package cz.cuni.mff.mongodb;
 import com.mongodb.MongoBulkWriteException;
 import com.mongodb.MongoSecurityException;
 import com.mongodb.client.MongoCollection;
-import cz.cuni.mff.DatasetBaseProduct;
-import cz.cuni.mff.ZalandoProduct;
-import cz.cuni.mff.ZootProduct;
+import cz.cuni.mff.dataset_products.DatasetBaseProduct;
+import cz.cuni.mff.dataset_products.ZalandoProduct;
+import cz.cuni.mff.dataset_products.ZootProduct;
 import cz.cuni.mff.dataset_products.DatasetDeserializer;
 
 import java.io.File;
@@ -15,11 +15,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Class for uploading products from the Zoot and Zalando datasets to the MongoDB collections.
+ */
 public class ProductsUploader extends ProductsDbManager {
+
+    /**
+     * Initializes the MongoDB connection with the provided credentials.
+     *
+     * @param dbUsername MongoDB username
+     * @param dbPassword MongoDB password
+     */
     public ProductsUploader(String dbUsername, String dbPassword) {
         super(dbUsername, dbPassword);
     }
 
+    /**
+     * Uploads new products from the Zoot and Zalando datasets to the MongoDB collections.
+     * The method checks if the products are already uploaded and only uploads new products.
+     *
+     * @throws IOException if the products could not be deserialized
+     * @throws IllegalArgumentException if the connection to MongoDB could not be established
+     * using the connection string constructed from the provided username and password
+     */
     public void uploadNewProducts() throws IOException, IllegalArgumentException {
         try {
             for (File zootFile: DatasetDeserializer.getZootDatasetFiles()) {
@@ -40,6 +58,15 @@ public class ProductsUploader extends ProductsDbManager {
         }
     }
 
+    /**
+     * Uploads products from the provided JSON file to the MongoDB collection with the given name.
+     * @param productsFile
+     * @param collectionName
+     * @param productType
+     * @param <ProductType>
+     * @throws IOException
+     * @throws MongoSecurityException
+     */
     private <ProductType extends DatasetBaseProduct> void uploadProductsFromFile(
             File productsFile,
             String collectionName,
@@ -87,6 +114,13 @@ public class ProductsUploader extends ProductsDbManager {
         }
     }
 
+    /**
+     * Filters out products that are already uploaded to the MongoDB collection.
+     * @param productsToUpload
+     * @param collection
+     * @param <ProductType>
+     * @return list of products that are not yet uploaded
+     */
     private <ProductType extends DatasetBaseProduct> List<ProductType> filterNewProducts(
             List<ProductType> productsToUpload, MongoCollection<ProductType> collection
     ) {
@@ -101,6 +135,12 @@ public class ProductsUploader extends ProductsDbManager {
         return newProducts.collect(Collectors.toList());
     }
 
+    /**
+     * Checks if the collection with the given name already exists in the connected MongoDB database.
+     * @param collectionName
+     * @return
+     * @throws MongoSecurityException
+     */
     private boolean collectionExists (String collectionName) throws MongoSecurityException {
         System.out.println("Checking if collection already exists: " + collectionName);
 
@@ -113,6 +153,15 @@ public class ProductsUploader extends ProductsDbManager {
         return false;
     }
 
+    /**
+     * Tries to upload products from the provided JSON file to the MongoDB collection with the given name.
+     * @param productsFile
+     * @param collectionName
+     * @param productType
+     * @param <ProductType>
+     * @throws IOException if the products could not be deserialized
+     * @throws MongoSecurityException
+     */
     private <ProductType extends DatasetBaseProduct> void tryUploadProductsToMongo(
             File productsFile,
             String collectionName,

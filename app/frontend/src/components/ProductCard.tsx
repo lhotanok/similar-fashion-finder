@@ -1,13 +1,27 @@
 import Card from '@mui/material/Card';
 import {useRef} from 'react';
 import {Product} from '../types/Product';
-import {Box, CardActionArea, CardContent, CardMedia, Tooltip, Typography} from '@mui/material';
+import {Box, Button, CardActionArea, CardActions, CardContent, CardMedia, Tooltip, Typography} from '@mui/material';
 
 export default function ProductCard({product}: {product: Product}) {
   const cardRef = useRef<HTMLDivElement>(null);
 
   console.log(`Rendering ProductCard for product: ${product.id}`, {product});
+  const value = {
+    product: {
+      product: {
+        value: {
+          val: 5,
+        } as { val: number } | null
+      } as { value: { val: number } } | null
+    }
+  }
 
+
+
+
+  
+  const myVal = value?.product?.product?.value?.val;
   return (
     <Card
       ref={cardRef}
@@ -37,6 +51,10 @@ export default function ProductCard({product}: {product: Product}) {
             <Typography variant='subtitle2' color='secondary.dark' fontWeight='bold'>
               {parsePrice(product)}
             </Typography>
+            <CardActions>
+        <Button size="small">Share</Button>
+        <Button size="small">Learn More</Button>
+          </CardActions>
           </Box>
           <CardMedia
             component='img'

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Similar Fashion Finder</title>
+</head>
+<body>
+<h1>Backend of a web application for searching fashion products by images 👗📷</h1>
+<p>
+    Similar Fashion Finder is a web-based tool for searching fashion products by images.<br>
+    It is designed to help users find similar fashion products by uploading an image of a product they like.<br>
+    The application uses several image hashing algorithms to compare the uploaded image with a database
+    of fashion products.<br>The user can then view the similar products and purchase them online.
+</p>
+<p>
+    The backend of the application consists of the following components:
+    <ol>
+    <li>
+        <h2>Product Database</h2>
+            A database of fashion products with image URLs and other metadata.<br>
+            Each product is represented as a document in a MongoDB collection.<br>
+            Each website has its own collection in the database, such as 'zalando-products' and 'zoot-products'.
+    </li>
+    <li>
+        <h2>Image Processing</h2>
+        Images are extracted from product data, they are downloaded from remote URLs,<br>
+        transformed (cropped to square and resized to a smaller size for more efficient processing)<br>
+        and uploaded to the H2 database in form of hashes. There are several hashing algorithms used to hash
+        the images:<br><br>
+        <ul>
+            <li>Difference Hash</li>
+            <li>Perceptive Hash</li>
+            <li>Wavelet Hash</li>
+            <li>RotP Hash</li>
+        </ul>
+    </li>
+    <li>
+        <h2>Image Search API</h2>
+        An API that accepts an image URL, searches for similar images and uses those
+        images to extract similar products from the MongoDB database.<br>Those products are then returned to the user
+        along with the similarity score (distance and hamming distance) between the queried image and searched images.
+    </li>
+</ol>
+</body>
+</html>

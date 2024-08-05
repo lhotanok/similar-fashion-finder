@@ -2,7 +2,7 @@ package cz.cuni.mff.image_search_api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import cz.cuni.mff.DatasetBaseProduct;
+import cz.cuni.mff.dataset_products.DatasetBaseProduct;
 import cz.cuni.mff.mongodb.ProductsRetrieval;
 import dev.brachtendorf.jimagehash.datastructures.tree.Result;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -32,6 +32,12 @@ import java.util.PriorityQueue;
 
 import static spark.Spark.get;
 
+/**
+ * This class represents the API for searching similar products based on the image URL.
+ * The API provides a single endpoint for searching similar products using the URL of the image.
+ * The endpoint returns a list of products that are similar to the image provided as a link
+ * in the query parameter.
+ */
 @OpenAPIDefinition(
         info = @Info(
                 title = "Image Matcher API",
@@ -54,14 +60,29 @@ public class ImageSearchApi {
     private final ProductsRetrieval productsRetrieval;
     private final ObjectMapper objectMapper;
 
+    /**
+     * Initializes the API with the provided credentials for the H2 and MongoDB databases.
+     *
+     * @param h2Username    username for the H2 database
+     * @param h2Password    password for the H2 database
+     * @param mongoUsername username for the MongoDB database
+     * @param mongoPassword password for the MongoDB database
+     * @throws SQLException if the connection to the H2 database could not be established
+     */
     public ImageSearchApi(
-            String mysqlUsername, String mysqlPassword, String mongoUsername, String mongoPassword
+            String h2Username, String h2Password, String mongoUsername, String mongoPassword
     ) throws SQLException {
-        imagesRetrieval = new ImagesRetrieval(mysqlUsername, mysqlPassword);
+        imagesRetrieval = new ImagesRetrieval(h2Username, h2Password);
         productsRetrieval = new ProductsRetrieval(mongoUsername, mongoPassword);
         objectMapper = new ObjectMapper();
     }
 
+    /**
+     * Sets up the API endpoint for URL based image search.
+     * The endpoint is accessible at the path {@link #URL_BASED_SEARCH_PATH}.
+     * The endpoint expects the image URL as a query parameter.
+     * The endpoint returns a list of products that are similar to the image.
+     */
     @GET
     @Path(URL_BASED_SEARCH_PATH)
     @Operation(
@@ -92,7 +113,7 @@ public class ImageSearchApi {
         get(URL_BASED_SEARCH_PATH, (request, response) -> {
             response.type("application/json");
 
-            String imageUrl = getDecodeImageUrl(request);
+            String imageUrl = decodeImageUrl(request);
 
             PriorityQueue<Result<String>> matchedImages;
             try {
@@ -120,6 +141,12 @@ public class ImageSearchApi {
         });
     }
 
+    /**
+     * Parses the matched image names from the queue of matched images.
+     *
+     * @param matchedImages list of matched images
+     * @return list of matched image names
+     */
     private static List<String> parseMatchedProductIds (PriorityQueue<Result<String>> matchedImages) {
         var matchedImageNames = matchedImages.stream()
                 .map(result -> new File(result.value).getName());
@@ -129,15 +156,31 @@ public class ImageSearchApi {
         ).toList();
     }
 
-    private static String getDecodeImageUrl (Request request) {
+    /**
+     * Decodes the image URL from the query parameter.
+     *
+     * @param request HTTP request containing the image URL query parameter
+     * @return decoded image URL
+     */
+    private static String decodeImageUrl(Request request) {
         String imageUrl = request.queryParams("imageUrl");
 
-        String decodedImageUrl = decodeImageUrl(imageUrl);
+        String decodedImageUrl = URLDecoder.decode(imageUrl, StandardCharsets.UTF_8);
         System.out.println("Searching similar images for imageUrl: " + decodedImageUrl);
 
         return decodedImageUrl;
     }
 
+    /**
+     * Reports a server error to the client.
+     * The error message is serialized to JSON and sent to the client with the HTTP status code 500.
+     *
+     * @param e        exception that occurred
+     * @param response HTTP response to be sent to the client
+     * @param message  error message to be sent to the client
+     * @return JSON representation of the error message
+     * @throws JsonProcessingException if the error message could not be serialized to JSON
+     */
     private String reportServerError(Exception e, Response response, String message) throws JsonProcessingException {
         e.printStackTrace();
         response.status(500);
@@ -147,10 +190,14 @@ public class ImageSearchApi {
         );
     }
 
-    private static String decodeImageUrl(String imageUrl) {
-        return URLDecoder.decode(imageUrl, StandardCharsets.UTF_8);
-    }
-
+    /**
+     * Builds the response items for the client. The response items are constructed from the matched products
+     * and the match data between the query image and the matched images. Each item contains the product data
+     * and the match data (distance and normalized Hamming distance).
+     * @param products the list of products that were matched as similar to the query image
+     * @param matches the list of matches between the query image and the matched images
+     * @return
+     */
     private static List<ProductMatch> buildResponseItems (
             List<? extends DatasetBaseProduct> products,
             PriorityQueue<Result<String>> matches

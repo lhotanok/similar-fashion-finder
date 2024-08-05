@@ -6,7 +6,18 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+/**
+ * Class for downloading and deleting image files.
+ */
 public class ImageFileManager {
+    /**
+     * Downloads a file from the provided remote URL to the local file.
+     *
+     * @param remoteFileUrl the URL of the remote file to download
+     * @param localFilepath the local file path to save the downloaded file to
+     * @return the downloaded file
+     * @throws IllegalArgumentException if the file could not be downloaded
+     */
     public static File downloadFile(String remoteFileUrl, String localFilepath) {
         try {
             File downloadedFile = new File(localFilepath);
@@ -29,6 +40,11 @@ public class ImageFileManager {
         }
     }
 
+    /**
+     * Deletes the provided local file.
+     *
+     * @param localFile the local file to delete
+     */
     public static void deleteFile(File localFile) {
         if (localFile.delete()) {
             System.out.println("Local file deleted successfully: " + localFile.getName());

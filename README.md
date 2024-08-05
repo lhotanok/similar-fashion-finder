@@ -47,12 +47,12 @@ The process of data uploading can take longer based on the amount of products yo
 
 Image Matcher API is documented with Swagger Open API. You can access it at: `http://localhost:4567/swagger`.
 
-![Swagger Image Matcher API](https://i.imgur.com/y6FGEEI.png)
+![](https://i.imgur.com/y6FGEEI.png)
 
 ### Frontend
 
 Frontend code is stored in `app/frontend` directory. It is a single page React application where users can provide image URL and this URL is used as a parameter in search for same or at least similar products.
 
-The application is accessible on `http://localhost:3000` and it is deployed with `docker-compose up -d` command along with MongoDB and backend application. It can also be started individually by running `npm start` from the `app/frontend` directory.
+The application is accessible on `http://localhost:3000` and it is deployed with `docker-compose up -d` command along with MongoDB and backend application. It can also be started individually by running `npm start` from the `app/frontend` directory. 
 
 ![Similar Fashion Finder](https://i.imgur.com/dZpCK7d.png)

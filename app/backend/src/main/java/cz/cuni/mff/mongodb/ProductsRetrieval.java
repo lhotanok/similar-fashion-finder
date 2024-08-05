@@ -1,19 +1,36 @@
 package cz.cuni.mff.mongodb;
 
 import com.mongodb.client.MongoCollection;
-import cz.cuni.mff.DatasetBaseProduct;
-import cz.cuni.mff.ZalandoProduct;
+import cz.cuni.mff.dataset_products.DatasetBaseProduct;
+import cz.cuni.mff.dataset_products.ZalandoProduct;
 import org.bson.Document;
-import cz.cuni.mff.ZootProduct;
+import cz.cuni.mff.dataset_products.ZootProduct;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class for fetching products from the MongoDB collections "zoot-products" and "zalando-products".
+ */
 public class ProductsRetrieval extends ProductsDbManager {
+    /**
+     * Initializes the MongoDB connection with the provided credentials.
+     *
+     * @param dbUsername MongoDB username
+     * @param dbPassword MongoDB password
+     */
     public ProductsRetrieval(String dbUsername, String dbPassword) {
         super(dbUsername, dbPassword);
     }
 
+    /**
+     * Fetches products from available MongoDB collections - "zoot-products" and "zalando-products".
+     * The method retrieves products from Zoot and Zalando collections using their unique IDs
+     * and stores them in a common list of {@link DatasetBaseProduct} objects.
+     *
+     * @param ids list of product IDs to fetch
+     * @return list of products with the given IDs
+     */
     public List<DatasetBaseProduct> fetchProducts(List<String> ids) {
         System.out.println("Fetching products with IDs: ");
         ids.forEach(System.out::println);
@@ -41,6 +58,14 @@ public class ProductsRetrieval extends ProductsDbManager {
         return products;
     }
 
+    /**
+     * Fetches products from a given collection based on their IDs.
+     *
+     * @param ids list of product IDs to fetch
+     * @param collection collection to fetch products from
+     * @param <ProductType> type of the products in the collection
+     * @return list of products with the given IDs
+     */
     private <ProductType> List<ProductType> fetchProductsFromCollection(
             List<String> ids, MongoCollection<ProductType> collection
     ) {

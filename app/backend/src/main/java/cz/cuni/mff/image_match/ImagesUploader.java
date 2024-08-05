@@ -1,8 +1,8 @@
 package cz.cuni.mff.image_match;
 
-import cz.cuni.mff.DatasetBaseProduct;
-import cz.cuni.mff.ZalandoProduct;
-import cz.cuni.mff.ZootProduct;
+import cz.cuni.mff.dataset_products.DatasetBaseProduct;
+import cz.cuni.mff.dataset_products.ZalandoProduct;
+import cz.cuni.mff.dataset_products.ZootProduct;
 import cz.cuni.mff.dataset_products.DatasetDeserializer;
 
 import java.io.File;
@@ -12,15 +12,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
+/**
+ * Class for downloading and uploading images to the H2 database.
+ */
 public class ImagesUploader extends ImageMatcherDbManager {
     private static final int THREADPOOL_SIZE = Runtime.getRuntime().availableProcessors();;
 
+    /**
+     * Initializes the connection to the H2 database with the provided username and password.
+     *
+     * @param sqlUsername username for the H2 database
+     * @param sqlPassword password for the H2 database
+     * @throws SQLException if the connection to the H2 database could not be established
+     */
     public ImagesUploader(String sqlUsername, String sqlPassword) throws SQLException {
         super(sqlUsername, sqlPassword);
-
-        // recreateImageMatcherDb();
     }
 
+    /**
+     * Downloads thumbnail images of products from the Zoot and Zalando datasets in parallel.
+     * The downloaded images are transformed and uploaded to the H2 database.
+     *
+     * @throws IOException if the image could not be downloaded
+     * @throws SQLException if the connection to the H2 database could not be established
+     * @throws InterruptedException if the thread is interrupted while waiting for the image to be uploaded
+     */
     public void uploadProductImages() throws IOException, SQLException, InterruptedException {
         for (File zootFile: DatasetDeserializer.getZootDatasetFiles()) {
             List<ZootProduct> zootProducts = DatasetDeserializer.deserializeJsonCollection(
@@ -43,6 +59,12 @@ public class ImagesUploader extends ImageMatcherDbManager {
         }
     }
 
+    /**
+     * Transforms and saves the downloaded images to the H2 database.
+     * @param downloadedImages the list of downloaded images to be transformed and saved. Images are stored
+     *                         in temporary files and they can be deleted once they are uploaded to the database.
+     * @throws InterruptedException if the thread is interrupted while waiting for the image to be uploaded
+     */
     private void transformAndSave(List<File> downloadedImages) throws InterruptedException {
         uploadImagesToDb(downloadedImages);
 
@@ -53,6 +75,15 @@ public class ImagesUploader extends ImageMatcherDbManager {
         System.out.printf("All temporary files for %d thumbnail files were deleted%n", downloadedImages.size());*/
     }
 
+    /**
+     * Downloads thumbnail images of products in parallel.
+     * The downloaded images are stored in temporary files.
+     *
+     * @param products the list of products to download thumbnail images for
+     * @param <ProductType> the type of the product
+     * @return the list of images downloaded into temporary files
+     * @throws InterruptedException if the thread is interrupted while waiting for the image to be downloaded
+     */
     private <ProductType extends DatasetBaseProduct> List<File> downloadThumbnailImagesInParallel(List<ProductType> products)
             throws InterruptedException {
         try (ExecutorService executorService = Executors.newFixedThreadPool(THREADPOOL_SIZE)) {
@@ -93,6 +124,12 @@ public class ImagesUploader extends ImageMatcherDbManager {
         }
     }
 
+    /**
+     * Uploads the transformed images to the H2 database.
+     *
+     * @param transformedImages the list of transformed images to upload to the H2 database
+     * @throws InterruptedException if the thread is interrupted while waiting for the image to be uploaded
+     */
     private void uploadImagesToDb(List<File> transformedImages)
             throws InterruptedException {
         System.out.printf(

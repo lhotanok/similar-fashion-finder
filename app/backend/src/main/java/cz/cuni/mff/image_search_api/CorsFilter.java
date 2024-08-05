@@ -5,6 +5,11 @@ import spark.Request;
 import spark.Response;
 import spark.Spark;
 
+/**
+ * This class configures the CORS filter for the API.
+ * The filter allows cross-origin requests from any origin and enables the following methods:
+ * GET, POST, PUT, DELETE, OPTIONS.
+ */
 public class CorsFilter {
 
     private static final String ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
